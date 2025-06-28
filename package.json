@@ -1,16 +1,12 @@
 {
   "name": "signalk-starlink-gps",
-  "version": "1.0.4",
+  "version": "1.0.1",
   "description": "Signal K plugin for Starlink GPS data",
   "keywords": ["signalk-node-server-plugin", "signalk-category-gps"],
   "main": "index.js",
   "scripts": { "test": "echo \"No tests\" && exit 0" },
   "author": "Marc Robitaille",
   "license": "Apache-2.0",
-  "dependencies": {
-    "@grpc/grpc-js": "^1.8.0",
-    "@grpc/proto-loader": "^0.7.0"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/flydr2/signalk-starlink-gps.git"
