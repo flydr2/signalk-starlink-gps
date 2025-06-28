@@ -1,6 +1,6 @@
 {
   "name": "signalk-starlink-gps",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Signal K plugin for Starlink GPS data",
   "keywords": ["signalk-node-server-plugin", "signalk-category-gps"],
   "main": "index.js",
