@@ -1,6 +1,6 @@
 {
   "name": "signalk-starlink-gps",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Signal K plugin to fetch GPS data from Starlink terminal via HTTP",
   "main": "index.js",
   "scripts": {
@@ -10,9 +10,7 @@
   "author": "flydr2",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.6.0",
-    "cheerio": "^1.0.0",
-    "undici": "^6.19.8"
+    "puppeteer": "^23.0.0"
   },
   "repository": {
     "type": "git",
