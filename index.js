@@ -16,20 +16,16 @@ module.exports = function (app) {
             return;
           }
           app.error('Raw gRPC response: ' + stdout);
-
-          let enabled = 'N/A', latitude = 'N/A', longitude = 'N/A', altitude = 'N/A';
-          let uncertainty = 'N/A', gps_time = 'N/A', uncertainty_valid = 'N/A';
-
           try {
             const data = JSON.parse(stdout);
             const location = data.get_location || {};
-            enabled = location.enabled !== undefined ? location.enabled : (location.lla ? true : 'N/A');
-            latitude = location.latitude !== undefined ? location.latitude : (location.lla?.lat || 'N/A');
-            longitude = location.longitude !== undefined ? location.longitude : (location.lla?.lon || 'N/A');
-            altitude = location.altitude_meters !== undefined ? location.altitude_meters : (location.lla?.alt || 'N/A');
-            uncertainty = location.uncertainty_meters !== undefined ? location.uncertainty_meters : 5;
-            gps_time = location.gps_time_s !== undefined ? location.gps_time_s : Date.now() / 1000;
-            uncertainty_valid = location.uncertainty_meters_valid !== undefined ? location.uncertainty_meters_valid : true;
+            const enabled = location.enabled !== undefined ? location.enabled : (location.lla ? true : 'N/A');
+            const latitude = location.latitude !== undefined ? location.latitude : (location.lla?.lat || 'N/A');
+            const longitude = location.longitude !== undefined ? location.longitude : (location.lla?.lon || 'N/A');
+            const altitude = location.altitude_meters !== undefined ? location.altitude_meters : (location.lla?.alt || 'N/A');
+            const uncertainty = location.uncertainty_meters !== undefined ? location.uncertainty_meters : 5;
+            const gps_time = location.gps_time_s !== undefined ? location.gps_time_s : 'N/A';
+            const uncertainty_valid = location.uncertainty_meters_valid !== undefined ? location.uncertainty_meters_valid : true;
 
             console.log(`Enabled: ${enabled}, Latitude: ${latitude}, Longitude: ${longitude}, Altitude: ${altitude}, Uncertainty: ${uncertainty}, GpsTime: ${gps_time}, UncertaintyValid: ${uncertainty_valid}`);
 
@@ -38,6 +34,7 @@ module.exports = function (app) {
                 values: [{
                   path: 'starlink.position',
                   value: {
+                    gps_time: gps_time !== 'N/A' ? parseFloat(gps_time) : null,
                     latitude: latitude !== 'N/A' ? parseFloat(latitude) : null,
                     longitude: longitude !== 'N/A' ? parseFloat(longitude) : null,
                     altitude: altitude !== 'N/A' ? parseFloat(altitude) : null
