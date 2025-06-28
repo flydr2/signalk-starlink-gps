@@ -3,25 +3,22 @@ syntax = "proto3";
 package SpaceX.API.Device;
 
 service Device {
-  rpc GetDeviceInfo (Request) returns (Response) {}
+  rpc DishGetLocation (Request) returns (Response) {}
 }
 
 message Request {
 }
 
 message Response {
-  DeviceInfo device_info = 1000;
+  DishLocation location = 1000;
 }
 
-message DeviceInfo {
-  message Location {
-    bool enabled = 1;
-    double latitude = 2;
-    double longitude = 3;
-    double altitude_meters = 4;
-    bool uncertainty_meters_valid = 5;
-    double uncertainty_meters = 6;
-    double gps_time_s = 7;
-  }
-  Location location = 10;
+message DishLocation {
+  bool enabled = 1;
+  double latitude = 2;
+  double longitude = 3;
+  double altitude_meters = 4;
+  bool uncertainty_meters_valid = 5;
+  double uncertainty_meters = 6;
+  double gps_time_s = 7;
 }
