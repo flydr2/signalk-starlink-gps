@@ -7,21 +7,22 @@ module.exports = function (app) {
     description: 'Fetches GPS data from Starlink terminal via gRPC',
     start: function (options, restartPlugin) {
       setInterval(() => {
-        exec('grpcurl -plaintext -d \'{"get_location": {}}\' 192.168.100.1:9200 SpaceX.API.Device.Device/Handle', (err, stdout) => {
+        exec('grpcurl -plaintext -d \'{"get_location": {}}\' 192.168.100.1:9200 SpaceX.API.Device.Device/Handle', (err, stdout, stderr) => {
           if (err) {
             app.error('gRPC error: ' + err.message);
-            if (err.message.includes('UNAVAILABLE')) {
+            if (err.message.includes('UNAVAILABLE') || stderr.includes('offline')) {
               app.error('Obstruction detected, reposition dish');
             }
             return;
           }
+          app.error('Raw gRPC response: ' + stdout); // Debug output
           try {
             const data = JSON.parse(stdout);
             const location = data.get_location || {};
             const enabled = location.enabled !== undefined ? location.enabled : 'N/A';
-            const latitude = location.lla?.lat !== undefined ? location.lla.lat : 'N/A';
-            const longitude = location.lla?.lon !== undefined ? location.lla.lon : 'N/A';
-            const altitude = location.lla?.alt !== undefined ? location.lla.alt : 'N/A';
+            const latitude = location.latitude !== undefined ? location.latitude : 'N/A';
+            const longitude = location.longitude !== undefined ? location.longitude : 'N/A';
+            const altitude = location.altitude_meters !== undefined ? location.altitude_meters : 'N/A';
             const uncertainty = location.uncertainty_meters !== undefined ? location.uncertainty_meters : 'N/A';
             const gps_time = location.gps_time_s !== undefined ? location.gps_time_s : 'N/A';
             const uncertainty_valid = location.uncertainty_meters_valid !== undefined ? location.uncertainty_meters_valid : 'N/A';
@@ -53,7 +54,7 @@ module.exports = function (app) {
             app.error('JSON parse error: ' + e.message);
           }
         });
-      }, 5000); // Changed to 5 seconds for stability
+      }, 5000);
     },
     stop: function () {},
     schema: {}
