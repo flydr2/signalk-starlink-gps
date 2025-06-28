@@ -35,3 +35,16 @@ Follow these steps to install and configure the plugin on your Raspberry Pi:
    ```bash
    sudo apt update
    sudo apt install -y grpcurl
+
+   sudo npm install -g signalk-server
+   cd ~/.signalk
+rm -rf node_modules/signalk-starlink-gps
+npm cache clean --force
+npm install git+https://github.com/flydr2/signalk-starlink-gps.git
+npm audit fix
+
+restart signalk
+
+Enable Plugin:
+
+    Open http://<pi-ip>:3000 > Server > Plugin Config, enable signalk-starlink-gps, save.
