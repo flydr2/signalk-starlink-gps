@@ -1,46 +1,41 @@
-const grpc = require('@grpc/grpc-js');
-const protoLoader = require('@grpc/proto-loader');
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 module.exports = function (app) {
   let plugin = {};
-  let client;
 
   plugin.id = 'signalk-starlink-gps';
   plugin.name = 'Starlink GPS';
-  plugin.description = 'Fetches GPS data from Starlink terminal via gRPC';
+  plugin.description = 'Fetches GPS data from Starlink terminal via HTTP';
 
   plugin.start = function (options) {
-    // Load proto file
-    const protoDefinition = protoLoader.loadSync(__dirname + '/dish.proto', {
-      keepCase: true,
-      longs: String,
-      enums: String,
-      defaults: true,
-      oneofs: true
-    });
-    const proto = grpc.loadPackageDefinition(protoDefinition).SpaceX.API.Device;
+    setInterval(async () => {
+      try {
+        const response = await axios.get('http://192.168.100.1');
+        const $ = cheerio.load(response.data);
+        const preText = $('pre').text(); // Assumes JSON is in <pre> tag
 
-    // Initialize gRPC client
-    client = new proto.Device('192.168.100.1:9200', grpc.credentials.createInsecure());
+        if (preText.includes('"location"')) {
+          const data = JSON.parse(preText);
+          const location = data.location || {};
+          const enabled = location.enabled !== undefined ? location.enabled : 'N/A';
+          const latitude = location.latitude !== undefined ? location.latitude : 'N/A';
+          const longitude = location.longitude !== undefined ? location.longitude : 'N/A';
+          const altitude = location.altitude_meters !== undefined ? location.altitude_meters : 'N/A';
+          const uncertainty = location.uncertainty_meters !== undefined ? location.uncertainty_meters : 'N/A';
+          const gps_time = location.gps_time_s !== undefined ? location.gps_time_s : 'N/A';
+          const uncertainty_valid = location.uncertainty_meters_valid !== undefined ? location.uncertainty_meters_valid : 'N/A';
 
-    // Poll every 5 seconds
-    setInterval(() => {
-      client.GetDeviceInfo({}, (err, response) => {
-        if (err) {
-          console.log(`Error: ${err.message}`);
-          return;
+          console.log(`Enabled: ${enabled}, Latitude: ${latitude}, Longitude: ${longitude}, Altitude: ${altitude}, Uncertainty: ${uncertainty}, GpsTime: ${gps_time}, UncertaintyValid: ${uncertainty_valid}`);
+        } else {
+          console.log('No location data found');
         }
-        const location = response.device_info?.location || {};
-        const enabled = location.enabled !== undefined ? location.enabled : 'N/A';
-        const latitude = location.latitude !== undefined ? location.latitude : 'N/A';
-        const longitude = location.longitude !== undefined ? location.longitude : 'N/A';
-        const altitude = location.altitude_meters !== undefined ? location.altitude_meters : 'N/A';
-        const uncertainty = location.uncertainty_meters !== undefined ? location.uncertainty_meters : 'N/A';
-        const gps_time = location.gps_time_s !== undefined ? location.gps_time_s : 'N/A';
-        const uncertainty_valid = location.uncertainty_meters_valid !== undefined ? location.uncertainty_meters_valid : 'N/A';
-
-        console.log(`Enabled: ${enabled}, Latitude: ${latitude}, Longitude: ${longitude}, Altitude: ${altitude}, Uncertainty: ${uncertainty}, GpsTime: ${gps_time}, UncertaintyValid: ${uncertainty_valid}`);
-      });
+      } catch (err) {
+        console.log(`Error: ${err.message}`);
+        if (err.response?.data?.includes('offline')) {
+          console.log('Obstruction detected, reposition dish');
+        }
+      }
     }, 5000);
   };
 
