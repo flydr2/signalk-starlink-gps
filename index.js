@@ -19,9 +19,8 @@ module.exports = function (app) {
                 values: [{
                   path: 'starlink.gps.position',
                   value: {
-                    latitude: data.getLocation.lla.lat,
                     longitude: data.getLocation.lla.lon,
-                    altitude: data.getLocation.lla.alt
+                    latitude: data.getLocation.lla.lat
                   }
                 }]
               }]
