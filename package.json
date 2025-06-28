@@ -1,0 +1,16 @@
+{
+  "name": "signalk-starlink-gps",
+  "version": "1.0.0",
+  "description": "Signal K plugin to fetch GPS data from Starlink terminal via gRPC",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["signalk-node-server-plugin", "starlink", "gps"],
+  "author": "Marc Robitaille",
+  "license": "MIT",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.8.0",
+    "@grpc/proto-loader": "^0.7.0"
+  }
+}
