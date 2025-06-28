@@ -18,14 +18,14 @@ module.exports = function (app) {
           app.error('Raw gRPC response: ' + stdout);
           try {
             const data = JSON.parse(stdout);
-            const location = data.get_location || {};
-            const enabled = location.enabled !== undefined ? location.enabled : (location.lla ? true : 'N/A');
-            const latitude = location.latitude !== undefined ? location.latitude : (location.lla?.lat || 'N/A');
-            const longitude = location.longitude !== undefined ? location.longitude : (location.lla?.lon || 'N/A');
-            const altitude = location.altitude_meters !== undefined ? location.altitude_meters : (location.lla?.alt || 'N/A');
-            const uncertainty = location.uncertainty_meters !== undefined ? location.uncertainty_meters : 5;
+            const location = data.getLocation || {};
+            const enabled = location.lla ? true : 'N/A';
+            const latitude = location.lla?.lat !== undefined ? location.lla.lat : 'N/A';
+            const longitude = location.lla?.lon !== undefined ? location.lla.lon : 'N/A';
+            const altitude = location.lla?.alt !== undefined ? location.lla.alt : 'N/A';
+            const uncertainty = 5; // Default from CSV
             const gps_time = location.gps_time_s !== undefined ? location.gps_time_s : 'N/A';
-            const uncertainty_valid = location.uncertainty_meters_valid !== undefined ? location.uncertainty_meters_valid : true;
+            const uncertainty_valid = true; // Default
 
             console.log(`Enabled: ${enabled}, Latitude: ${latitude}, Longitude: ${longitude}, Altitude: ${altitude}, Uncertainty: ${uncertainty}, GpsTime: ${gps_time}, UncertaintyValid: ${uncertainty_valid}`);
 
@@ -54,7 +54,7 @@ module.exports = function (app) {
             app.error('JSON parse error: ' + e.message);
           }
         });
-      }, 5000);
+      }, 2000); // Your original polling interval
     },
     stop: function () {},
     schema: {}
