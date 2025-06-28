@@ -13,7 +13,7 @@ module.exports = function (app) {
       try {
         const response = await axios.get('http://192.168.100.1');
         const $ = cheerio.load(response.data);
-        const preText = $('pre').text(); // Assumes JSON is in <pre> tag
+        const preText = $('pre').text();
 
         if (preText.includes('"location"')) {
           const data = JSON.parse(preText);
@@ -40,7 +40,7 @@ module.exports = function (app) {
   };
 
   plugin.stop = function () {
-    // Cleanup if needed
+    // Cleanup
   };
 
   plugin.schema = {
