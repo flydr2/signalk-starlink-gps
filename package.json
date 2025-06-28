@@ -7,10 +7,14 @@
     "start": "node index.js"
   },
   "keywords": ["signalk-node-server-plugin", "starlink", "gps"],
-  "author": "Marc Robitaille",
+  "author": "flydr2",
   "license": "MIT",
   "dependencies": {
     "@grpc/grpc-js": "^1.8.0",
     "@grpc/proto-loader": "^0.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flydr2/signalk-starlink-gps.git"
   }
 }
