@@ -25,12 +25,12 @@ module.exports = function (app) {
 
     // Poll every 5 seconds
     setInterval(() => {
-      client.GetStatus({}, (err, response) => {
+      client.GetDeviceInfo({}, (err, response) => {
         if (err) {
           console.log(`Error: ${err.message}`);
           return;
         }
-        const location = response.dish_get_status?.location || {};
+        const location = response.device_info?.location || {};
         const enabled = location.enabled !== undefined ? location.enabled : 'N/A';
         const latitude = location.latitude !== undefined ? location.latitude : 'N/A';
         const longitude = location.longitude !== undefined ? location.longitude : 'N/A';
