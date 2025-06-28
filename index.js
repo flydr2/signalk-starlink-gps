@@ -15,14 +15,14 @@ module.exports = function (app) {
             }
             return;
           }
-          app.error('Raw gRPC response: ' + stdout); // Debug output
+          app.error('Raw gRPC response: ' + stdout);
           try {
             const data = JSON.parse(stdout);
-            const location = data.get_location || {};
-            const enabled = location.enabled !== undefined ? location.enabled : 'N/A';
-            const latitude = location.latitude !== undefined ? location.latitude : 'N/A';
-            const longitude = location.longitude !== undefined ? location.longitude : 'N/A';
-            const altitude = location.altitude_meters !== undefined ? location.altitude_meters : 'N/A';
+            const location = data.getLocation || {};
+            const enabled = location.lla ? true : 'N/A'; // Infer enabled if lla exists
+            const latitude = location.lla?.lat !== undefined ? location.lla.lat : 'N/A';
+            const longitude = location.lla?.lon !== undefined ? location.lla.lon : 'N/A';
+            const altitude = location.lla?.alt !== undefined ? location.lla.alt : 'N/A';
             const uncertainty = location.uncertainty_meters !== undefined ? location.uncertainty_meters : 'N/A';
             const gps_time = location.gps_time_s !== undefined ? location.gps_time_s : 'N/A';
             const uncertainty_valid = location.uncertainty_meters_valid !== undefined ? location.uncertainty_meters_valid : 'N/A';
