@@ -34,7 +34,6 @@ module.exports = function (app) {
                 values: [{
                   path: 'starlink.position',
                   value: {
-                    gps_time: gps_time !== 'N/A' ? parseFloat(gps_time) : null,
                     latitude: latitude !== 'N/A' ? parseFloat(latitude) : null,
                     longitude: longitude !== 'N/A' ? parseFloat(longitude) : null,
                     altitude: altitude !== 'N/A' ? parseFloat(altitude) : null
