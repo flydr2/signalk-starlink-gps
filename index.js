@@ -31,7 +31,7 @@ module.exports = function (app) {
             app.error('JSON parse error: ' + e);
           }
         });
-      }, 2000); // Every 2 seconds
+      }, 1000); // Every 1 seconds
     },
     stop: function () {},
     schema: {}
