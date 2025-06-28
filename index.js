@@ -17,7 +17,7 @@ module.exports = function (app) {
             const delta = {
               updates: [{
                 values: [{
-                  path: 'starlink.position',
+                  path: 'starlink.gps.position',
                   value: {
                     latitude: data.getLocation.lla.lat,
                     longitude: data.getLocation.lla.lon,
