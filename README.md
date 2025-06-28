@@ -48,3 +48,12 @@ restart signalk
 Enable Plugin:
 
     Open http://<pi-ip>:3000 > Server > Plugin Config, enable signalk-starlink-gps, save.
+
+Option if you want to use the GPS as your main source you can edit the index.js and replace:
+
+    path: 'starlink.gps.position'
+    
+to:
+
+    path: 'navigation.position',
+   
