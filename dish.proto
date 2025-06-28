@@ -3,17 +3,17 @@ syntax = "proto3";
 package SpaceX.API.Device;
 
 service Device {
-  rpc GetStatus (Request) returns (Response) {}
+  rpc GetDeviceInfo (Request) returns (Response) {}
 }
 
 message Request {
 }
 
 message Response {
-  DishGetStatus dish_get_status = 1000;
+  DeviceInfo device_info = 1000;
 }
 
-message DishGetStatus {
+message DeviceInfo {
   message Location {
     bool enabled = 1;
     double latitude = 2;
