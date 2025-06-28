@@ -4,57 +4,34 @@ module.exports = function (app) {
   const plugin = {
     id: 'signalk-starlink-gps',
     name: 'Starlink GPS Plugin',
-    description: 'Fetches GPS data from Starlink terminal via gRPC',
     start: function (options, restartPlugin) {
+      const { exec } = require('child_process');
       setInterval(() => {
-        exec('grpcurl -plaintext -d \'{"get_location": {"full_details": true}}\' 192.168.100.1:9200 SpaceX.API.Device.Device/Handle', (err, stdout, stderr) => {
+        exec('grpcurl -plaintext -d \'{"get_location": {}}\' 192.168.100.1:9200 SpaceX.API.Device.Device/Handle', (err, stdout) => {
           if (err) {
-            app.error('gRPC error: ' + err.message);
-            if (err.message.includes('UNAVAILABLE') || stderr.includes('offline')) {
-              app.error('Obstruction detected, reposition dish');
-            }
+            app.error('gRPC error: ' + err);
             return;
           }
-          app.error('Raw gRPC response: ' + stdout);
           try {
             const data = JSON.parse(stdout);
-            const location = data.getLocation || {};
-            const enabled = location.lla ? true : 'N/A';
-            const latitude = location.lla?.lat !== undefined ? location.lla.lat : 'N/A';
-            const longitude = location.lla?.lon !== undefined ? location.lla.lon : 'N/A';
-            const altitude = location.lla?.alt !== undefined ? location.lla.alt : 'N/A';
-            const uncertainty = 5; // Default from CSV
-            const gps_time = location.gps_time_s !== undefined ? location.gps_time_s : 'N/A';
-            const uncertainty_valid = true; // Default
-
-            console.log(`Enabled: ${enabled}, Latitude: ${latitude}, Longitude: ${longitude}, Altitude: ${altitude}, Uncertainty: ${uncertainty}, GpsTime: ${gps_time}, UncertaintyValid: ${uncertainty_valid}`);
-
             const delta = {
               updates: [{
                 values: [{
                   path: 'starlink.position',
                   value: {
-                    latitude: latitude !== 'N/A' ? parseFloat(latitude) : null,
-                    longitude: longitude !== 'N/A' ? parseFloat(longitude) : null,
-                    altitude: altitude !== 'N/A' ? parseFloat(altitude) : null
-                  }
-                }, {
-                  path: 'starlink.gnss',
-                  value: {
-                    enabled: enabled !== 'N/A' ? enabled : null,
-                    uncertainty: uncertainty !== 'N/A' ? parseFloat(uncertainty) : null,
-                    gps_time: gps_time !== 'N/A' ? parseFloat(gps_time) : null,
-                    uncertainty_valid: uncertainty_valid !== 'N/A' ? uncertainty_valid : null
+                    latitude: data.getLocation.lla.lat,
+                    longitude: data.getLocation.lla.lon,
+                    altitude: data.getLocation.lla.alt
                   }
                 }]
               }]
             };
             app.handleMessage('signalk-starlink-gps', delta);
           } catch (e) {
-            app.error('JSON parse error: ' + e.message);
+            app.error('JSON parse error: ' + e);
           }
         });
-      }, 2000); // Your original polling interval
+      }, 2000); // Every 2 seconds
     },
     stop: function () {},
     schema: {}
