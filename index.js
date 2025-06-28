@@ -1,19 +1,21 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 
 module.exports = function (app) {
   let plugin = {};
+  let browser;
 
   plugin.id = 'signalk-starlink-gps';
   plugin.name = 'Starlink GPS';
   plugin.description = 'Fetches GPS data from Starlink terminal via HTTP';
 
-  plugin.start = function (options) {
+  plugin.start = async function (options) {
+    browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+
     setInterval(async () => {
       try {
-        const response = await axios.get('http://192.168.100.1');
-        const $ = cheerio.load(response.data);
-        const preText = $('pre').text();
+        const page = await browser.newPage();
+        await page.goto('http://192.168.100.1', { waitUntil: 'networkidle2', timeout: 10000 });
+        const preText = await page.evaluate(() => document.querySelector('pre')?.innerText || '');
 
         if (preText.includes('"location"')) {
           const data = JSON.parse(preText);
@@ -29,18 +31,19 @@ module.exports = function (app) {
           console.log(`Enabled: ${enabled}, Latitude: ${latitude}, Longitude: ${longitude}, Altitude: ${altitude}, Uncertainty: ${uncertainty}, GpsTime: ${gps_time}, UncertaintyValid: ${uncertainty_valid}`);
         } else {
           console.log('No location data found');
+          if (await page.evaluate(() => document.body.innerText.includes('offline'))) {
+            console.log('Obstruction detected, reposition dish');
+          }
         }
+        await page.close();
       } catch (err) {
         console.log(`Error: ${err.message}`);
-        if (err.response?.data?.includes('offline')) {
-          console.log('Obstruction detected, reposition dish');
-        }
       }
     }, 5000);
   };
 
-  plugin.stop = function () {
-    // Cleanup
+  plugin.stop = async function () {
+    if (browser) await browser.close();
   };
 
   plugin.schema = {
